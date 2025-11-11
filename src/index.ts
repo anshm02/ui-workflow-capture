@@ -7,7 +7,7 @@ async function main() {
     throw new Error('OPENAI_API_KEY environment variable is required');
   }
 
-  const userTask = process.argv[2] || "How do I create a new page in Notion?";
+  const userTask = process.argv[2] || "How do I create a new page in Notion and name it 'Test Page'?";
 
   const agent = new Agent(openaiApiKey, {
     maxSteps: 20,
@@ -15,6 +15,7 @@ async function main() {
     slowMo: 500,
     viewportWidth: 1280,
     viewportHeight: 720,
+    userDataDir: 'user-data-dir', // Persistent context - maintains auth between runs
   });
 
   await agent.execute(userTask);

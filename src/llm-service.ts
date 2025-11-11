@@ -81,13 +81,16 @@ You must respond with a JSON object containing:
 {
   "action": "click" | "type" | "navigate" | "complete",
   "selector": "CSS selector for the element to interact with (required for click/type)",
+  "reasoning selector": "brief explanation of why this selector is the best choice for the action",
   "text": "text to type (required for type action)",
   "reasoning": "brief explanation of why this action advances toward the goal",
   "completed": boolean indicating if the task is fully completed
 }
 
 Rules:
-- Always use the most specific selector from the provided interactive elements
+- Use valid Playwright selectors from the provided list
+- To filter by text, use :has-text("...") or >> text=... syntax
+- Always use the most specific selector from the provided interactive elements that matches the task
 - Prefer visible, interactive elements (buttons, inputs, links)
 - Take incremental steps toward the goal
 - Set completed=true only when the task is fully accomplished

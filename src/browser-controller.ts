@@ -1,33 +1,63 @@
-import { chromium, Browser, Page } from 'playwright';
+import { chromium, Browser, BrowserContext, Page } from 'playwright';
 import { promises as fs } from 'fs';
 import { PageState, UIElement } from './types';
 
 export class BrowserController {
   private browser: Browser | null = null;
+  private context: BrowserContext | null = null;
   private page: Page | null = null;
+  private userDataDir: string | null = null;
 
   async initialize(config: {
     headless: boolean;
     slowMo: number;
     viewportWidth: number;
     viewportHeight: number;
+    userDataDir?: string;
   }): Promise<void> {
-    this.browser = await chromium.launch({
-      headless: config.headless,
-      slowMo: config.slowMo,
-    });
+    // Use persistent context if userDataDir is provided (maintains auth between runs)
+    if (config.userDataDir) {
+      this.userDataDir = config.userDataDir;
+      
+      // Ensure directory exists
+      await fs.mkdir(this.userDataDir, { recursive: true });
 
-    this.page = await this.browser.newPage();
-    await this.page.setViewportSize({
-      width: config.viewportWidth,
-      height: config.viewportHeight,
-    });
+      // Launch persistent context - saves cookies, localStorage, session data
+      this.context = await chromium.launchPersistentContext(this.userDataDir, {
+        headless: config.headless,
+        slowMo: config.slowMo,
+        viewport: {
+          width: config.viewportWidth,
+          height: config.viewportHeight,
+        },
+        acceptDownloads: true,
+        channel: 'chrome'
+      });
+
+      // Get existing page or create new one
+      this.page = this.context.pages()[0] || await this.context.newPage();
+    } else {
+      // Standard non-persistent mode
+      this.browser = await chromium.launch({
+        headless: config.headless,
+        slowMo: config.slowMo,
+      });
+
+      this.page = await this.browser.newPage();
+      await this.page.setViewportSize({
+        width: config.viewportWidth,
+        height: config.viewportHeight,
+      });
+    }
   }
 
   async navigate(url: string): Promise<void> {
     if (!this.page) throw new Error('Browser not initialized');
-    await this.page.goto(url, { waitUntil: 'networkidle' });
-    await this.page.waitForTimeout(1000);
+    await this.page.goto(url, 
+      { waitUntil: 'domcontentloaded', 
+        timeout: 30000
+      });
+    await this.page.waitForTimeout(2000);
   }
 
   async capturePageState(): Promise<PageState> {
@@ -82,7 +112,10 @@ export class BrowserController {
   }
 
   async close(): Promise<void> {
-    if (this.browser) {
+    // Close context if using persistent mode, otherwise close browser
+    if (this.context) {
+      await this.context.close();
+    } else if (this.browser) {
       await this.browser.close();
     }
   }

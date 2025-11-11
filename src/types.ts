@@ -48,5 +48,6 @@ export interface WorkflowConfig {
   slowMo: number;
   viewportWidth: number;
   viewportHeight: number;
+  userDataDir?: string; // Directory for persistent browser context (saves auth state)
 }
 

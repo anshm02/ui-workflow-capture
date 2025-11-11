@@ -16,6 +16,7 @@ export class Agent {
       slowMo: config.slowMo ?? 500,
       viewportWidth: config.viewportWidth ?? 1280,
       viewportHeight: config.viewportHeight ?? 720,
+      userDataDir: config.userDataDir ?? 'user-data-dir',
     };
 
     this.browser = new BrowserController();
@@ -35,6 +36,7 @@ export class Agent {
       slowMo: this.config.slowMo,
       viewportWidth: this.config.viewportWidth,
       viewportHeight: this.config.viewportHeight,
+      userDataDir: this.config.userDataDir,
     });
 
     try {
@@ -48,7 +50,7 @@ export class Agent {
       await this.executeWorkflowLoop(userTask);
 
       await this.state.exportSummary();
-      console.log(`\n=== Workflow Complete ===\n`);
+      console.log(`\nWorkflow Complete\n`);
 
       await this.browser.keepAlive(60);
     } catch (error) {
@@ -87,11 +89,14 @@ export class Agent {
       const pageState = await this.browser.capturePageState();
       const history = this.state.getHistory();
 
+      console.log('Determining next action...');
       const decision = await this.llm.determineNextAction(
         userTask,
         pageState,
         history
       );
+
+      console.log('Decision:', decision);
 
       const stepNumber = this.state.getCurrentStepNumber();
       const screenshotPath = `${this.config.screenshotDir}/step-${stepNumber}-${decision.action}.png`;
