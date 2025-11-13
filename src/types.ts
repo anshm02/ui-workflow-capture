@@ -31,6 +31,9 @@ export interface UIElement {
   name?: string;
   type?: string;
   value?: string;
+  region?: string;
+  parentSelector?: string;
+  depth?: number;
 }
 
 export interface PageState {

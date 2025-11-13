@@ -117,7 +117,7 @@ export class LLMService {
     historyContext: string
   ): string {
     const elementsJson = JSON.stringify(
-      state.interactiveElements.slice(0, 50),
+      state.interactiveElements.slice(0, 100),
       null,
       2
     );
