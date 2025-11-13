@@ -68,9 +68,14 @@ export class Agent {
     const screenshotPath = `${this.config.screenshotDir}/step-0-initial.png`;
     await this.browser.saveScreenshot(screenshotPath);
 
+    const pageState = await this.browser.capturePageState();
+    
+    const elementsPath = `${this.config.screenshotDir}/step-0-elements.json`;
+    await this.browser.saveElementsToJson(pageState.interactiveElements, elementsPath);
+
     const initialAction: ActionExecuted = {
       type: 'navigate',
-      url: (await this.browser.capturePageState()).url,
+      url: pageState.url,
     };
 
     this.state.addStep(
@@ -147,6 +152,11 @@ export class Agent {
       }
 
       await this.browser.saveScreenshot(screenshotPath);
+      
+      const postActionState = await this.browser.capturePageState();
+      const elementsPath = `${this.config.screenshotDir}/step-${stepNumber}-elements.json`;
+      await this.browser.saveElementsToJson(postActionState.interactiveElements, elementsPath);
+      
       this.state.addStep(executedAction, decision.reasoning, screenshotPath);
       this.state.printStep(stepNumber, decision.reasoning, executedAction);
 

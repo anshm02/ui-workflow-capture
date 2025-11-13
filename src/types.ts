@@ -25,6 +25,12 @@ export interface UIElement {
     width: number;
     height: number;
   };
+  ariaLabel?: string;
+  placeholder?: string;
+  title?: string;
+  name?: string;
+  type?: string;
+  value?: string;
 }
 
 export interface PageState {

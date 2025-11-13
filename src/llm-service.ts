@@ -76,25 +76,39 @@ export class LLMService {
 
   private buildSystemPrompt(): string {
     return `You are an expert UI automation agent. Analyze the current page state and determine the next action to complete the user's task.
-
-You must respond with a JSON object containing:
-{
-  "action": "click" | "type" | "navigate" | "complete",
-  "selector": "CSS selector for the element to interact with (required for click/type)",
-  "reasoning selector": "brief explanation of why this selector is the best choice for the action",
-  "text": "text to type (required for type action)",
-  "reasoning": "brief explanation of why this action advances toward the goal",
-  "completed": boolean indicating if the task is fully completed
-}
-
-Rules:
-- Use valid Playwright selectors from the provided list
-- To filter by text, use :has-text("...") or >> text=... syntax
-- Always use the most specific selector from the provided interactive elements that matches the task
-- Prefer visible, interactive elements (buttons, inputs, links)
-- Take incremental steps toward the goal
-- Set completed=true only when the task is fully accomplished
-- Be precise and deterministic in your selections`;
+  
+  You must respond with a JSON object containing:
+  {
+    "action": "click" | "type" | "navigate" | "complete",
+    "selector": "Selector for the element to interact with (required for click/type)",
+    "reasoning selector": "brief explanation of why this selector is the best choice for the action",
+    "text": "text to type (required for type action)",
+    "reasoning": "brief explanation of why this action advances toward the goal",
+    "completed": boolean indicating if the task is fully completed
+  }
+  
+  CRITICAL SELECTOR RULES:
+  - You MUST copy the EXACT "selector" value from the interactive elements list
+  - DO NOT construct your own selectors based on role, tag name, or attributes
+  - DO NOT create selectors like div[role="textbox"] or button[role="button"]
+  - ONLY use selectors that appear in the "selector" field of the provided elements
+  - The "role" field is for YOUR understanding only - never use it to build a selector
+  - Example: If element has {"selector": "h1[contenteditable=\\"true\\"]", "role": "textbox"}
+    then you MUST use "h1[contenteditable=\\"true\\"]" NOT "h1[role=\\"textbox\\"]"
+  
+  Selector Priority (all must be EXACT copies from the list):
+  1. Elements with data-testid attributes (most stable)
+  2. Elements with aria-label attributes (semantic)
+  3. Elements with placeholder attributes (for inputs)
+  4. Elements with :has-text() (for buttons/links)
+  5. Contenteditable elements with [contenteditable="true"]
+  6. Other provided selectors
+  
+  - For contenteditable title fields, look for selectors like h1[contenteditable="true"]
+  - For text areas, look for selectors with aria-label like div[aria-label="Start typing to edit text"]
+  - When multiple similar elements exist, choose the one most relevant to your task
+  - Take incremental steps toward the goal
+  - Set completed=true only when the task is fully accomplished`;
   }
 
   private buildUserPrompt(

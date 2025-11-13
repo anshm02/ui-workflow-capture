@@ -125,6 +125,11 @@ export class BrowserController {
     await this.page.waitForTimeout(seconds * 1000);
   }
 
+  async saveElementsToJson(elements: UIElement[], path: string): Promise<void> {
+    const jsonData = JSON.stringify(elements, null, 2);
+    await fs.writeFile(path, jsonData, 'utf-8');
+  }
+
   private async extractInteractiveElements(): Promise<UIElement[]> {
     if (!this.page) throw new Error('Browser not initialized');
 
@@ -138,6 +143,7 @@ export class BrowserController {
         '[role="button"]',
         '[role="link"]',
         '[role="textbox"]',
+        '[contenteditable="true"]',
         '[onclick]',
         '[data-testid]',
       ];
@@ -148,11 +154,22 @@ export class BrowserController {
         role: string;
         isVisible: boolean;
         boundingBox: { x: number; y: number; width: number; height: number } | undefined;
+        ariaLabel?: string;
+        placeholder?: string;
+        title?: string;
+        name?: string;
+        type?: string;
+        value?: string;
       }> = [];
+
+      const seenElements = new Set<Element>();
 
       interactiveSelectors.forEach((selectorType) => {
         const elements = document.querySelectorAll(selectorType);
         elements.forEach((el) => {
+          if (seenElements.has(el)) return;
+          seenElements.add(el);
+
           const rect = el.getBoundingClientRect();
           const isVisible =
             rect.width > 0 &&
@@ -162,27 +179,72 @@ export class BrowserController {
 
           if (!isVisible) return;
 
+          const htmlEl = el as HTMLElement;
           const text = (el.textContent || '').trim().slice(0, 100);
-          const role = el.getAttribute('role') || el.tagName.toLowerCase();
           
-          let selector = el.tagName.toLowerCase();
-          if (el.id) {
-            selector = `#${el.id}`;
-          } else if (el.className && typeof el.className === 'string') {
-            const classes = el.className.split(' ').filter((c: string) => c).slice(0, 3).join('.');
-            if (classes) {
-              selector = `${selector}.${classes}`;
-            }
-          }
-          
+          const ariaRole = el.getAttribute('role');
+          const tagName = el.tagName.toLowerCase();
+          const ariaLabel = el.getAttribute('aria-label');
+          const placeholder = (htmlEl as HTMLInputElement).placeholder;
+          const title = htmlEl.title;
+          const name = (htmlEl as HTMLInputElement).name;
+          const type = (htmlEl as HTMLInputElement).type;
+          const value = (htmlEl as HTMLInputElement).value;
           const testId = el.getAttribute('data-testid');
-          if (testId) {
-            selector = `[data-testid="${testId}"]`;
+          const contentEditable = htmlEl.contentEditable === 'true';
+          
+          let role = ariaRole || tagName;
+          if (tagName === 'input' && type) {
+            role = type === 'text' || type === 'email' || type === 'password' || type === 'search' || type === 'tel' || type === 'url' ? 'textbox' : type;
+          } else if (tagName === 'textarea') {
+            role = 'textbox';
+          } else if (contentEditable) {
+            role = 'textbox';
           }
 
-          const ariaLabel = el.getAttribute('aria-label');
-          if (ariaLabel) {
-            selector = `${selector}[aria-label="${ariaLabel}"]`;
+          let selector = '';
+          let locatorParts: string[] = [];
+
+          if (testId) {
+            selector = `[data-testid="${testId}"]`;
+            locatorParts.push(`testId="${testId}"`);
+          } else if (ariaLabel) {
+            if (role === 'button' || role === 'link' || role === 'textbox' || ariaRole) {
+              selector = `${tagName}[aria-label="${ariaLabel}"]`;
+              locatorParts.push(`role="${role}" name="${ariaLabel}"`);
+            } else {
+              selector = `[aria-label="${ariaLabel}"]`;
+              locatorParts.push(`label="${ariaLabel}"`);
+            }
+          } else if (placeholder && (tagName === 'input' || tagName === 'textarea')) {
+            selector = `${tagName}[placeholder="${placeholder}"]`;
+            locatorParts.push(`placeholder="${placeholder}"`);
+          } else if (text && text.length > 0 && text.length <= 50 && (tagName === 'button' || tagName === 'a' || ariaRole === 'button' || ariaRole === 'link')) {
+            const escapedText = text.replace(/"/g, '\\"');
+            selector = `${tagName}:has-text("${escapedText}")`;
+            locatorParts.push(`role="${role}" name="${text}"`);
+          } else if (contentEditable) {
+            selector = `${tagName}[contenteditable="true"]`;
+            locatorParts.push(`role="${role}"`);
+          } else if (ariaRole && (ariaRole === 'button' || ariaRole === 'link' || ariaRole === 'textbox' || ariaRole === 'checkbox' || ariaRole === 'radio')) {
+            selector = `${tagName}[role="${ariaRole}"]`;
+            locatorParts.push(`role="${ariaRole}"`);
+          } else if (name) {
+            selector = `${tagName}[name="${name}"]`;
+            locatorParts.push(`name="${name}"`);
+          } else {
+            if (el.id) {
+              selector = `#${el.id}`;
+            } else if (el.className && typeof el.className === 'string') {
+              const classes = el.className.split(' ').filter((c: string) => c && !/^[0-9]/.test(c)).slice(0, 2).join('.');
+              if (classes) {
+                selector = `${tagName}.${classes}`;
+              } else {
+                selector = tagName;
+              }
+            } else {
+              selector = tagName;
+            }
           }
 
           results.push({
@@ -190,17 +252,23 @@ export class BrowserController {
             text,
             role,
             isVisible,
-            boundingBox: isVisible ? {
+            boundingBox: {
               x: rect.x,
               y: rect.y,
               width: rect.width,
               height: rect.height,
-            } : undefined,
+            },
+            ariaLabel: ariaLabel || undefined,
+            placeholder: placeholder || undefined,
+            title: title || undefined,
+            name: name || undefined,
+            type: type || undefined,
+            value: value || undefined,
           });
         });
       });
 
-      return results.filter(el => el.isVisible);
+      return results;
     });
 
     return elements;
