@@ -1,0 +1,64 @@
+{
+  "task": "How do I edit the priority of a project to low in Linear",
+  "totalSteps": 6,
+  "startTime": "2025-11-14T20:18:04.343Z",
+  "endTime": "2025-11-14T20:18:30.401Z",
+  "steps": [
+    {
+      "stepNumber": 0,
+      "action": "navigate",
+      "reasoning": "Initial page load",
+      "screenshot": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-0-initial.png"
+    },
+    {
+      "stepNumber": 1,
+      "action": "click",
+      "selector": "a:has-text(\"TES-2Set up your teams (2)Nov 7\")",
+      "coordinates": {
+        "x": 758,
+        "y": 145
+      },
+      "reasoning": "Clicking on the project will open its details, where the priority can be edited to low.",
+      "screenshot": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-1-click.png"
+    },
+    {
+      "stepNumber": 2,
+      "action": "click",
+      "selector": "button:has-text(\"Set priority\")",
+      "coordinates": {
+        "x": 1140,
+        "y": 112
+      },
+      "reasoning": "Clicking this button will allow the user to select a new priority level, which is necessary to change it to low.",
+      "screenshot": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-2-click.png"
+    },
+    {
+      "stepNumber": 3,
+      "action": "click",
+      "selector": "li[id=\"4low\"]",
+      "coordinates": {
+        "x": 962,
+        "y": 280
+      },
+      "reasoning": "Clicking this option will change the project's priority to low, which is the next step in completing the task.",
+      "screenshot": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-3-click.png"
+    },
+    {
+      "stepNumber": 4,
+      "action": "click",
+      "selector": "button:has-text(\"Low\")",
+      "coordinates": {
+        "x": 1140,
+        "y": 112
+      },
+      "reasoning": "Clicking this button will change the project's priority to low, which is the next step toward completing the task.",
+      "screenshot": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-4-click.png"
+    },
+    {
+      "stepNumber": 5,
+      "action": "complete",
+      "reasoning": "Clicking this button will successfully change the project's priority to low, completing the task.",
+      "screenshot": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-5-complete.png"
+    }
+  ]
+}

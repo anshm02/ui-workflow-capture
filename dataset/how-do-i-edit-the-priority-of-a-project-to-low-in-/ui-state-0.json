@@ -1,0 +1,15 @@
+{
+  "stepNumber": 0,
+  "action": {
+    "type": "navigate",
+    "url": "https://linear.app/test12321100/team/TES/active"
+  },
+  "reasoning": "Initial page load",
+  "description": "Navigate to https://linear.app/test12321100/team/TES/active to begin the task. This is the starting point for the workflow where we load the initial page.",
+  "pageState": {
+    "url": "https://linear.app/test12321100/team/TES/active",
+    "title": "Test › Active issues"
+  },
+  "screenshotPath": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-0-initial.png",
+  "timestamp": "2025-11-14T20:18:04.337Z"
+}

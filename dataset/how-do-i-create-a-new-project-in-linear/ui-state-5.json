@@ -1,0 +1,16 @@
+{
+  "stepNumber": 5,
+  "action": {
+    "type": "type",
+    "selector": "div[aria-label=\"Project description\"]",
+    "text": "This project aims to improve team collaboration and streamline workflows."
+  },
+  "reasoning": "Entering a description is essential for providing context and details about the project, which is necessary to complete the project creation process.",
+  "description": "Type \"This project aims to improve team collaboration and streamline workflows.\" into the input field with selector \"div[aria-label=\"Project description\"]\". Entering a description is essential for providing context and details about the project, which is necessary to complete the project creation process.",
+  "pageState": {
+    "url": "https://linear.app/test12321100/projects/all",
+    "title": "Projects"
+  },
+  "screenshotPath": "dataset/how-do-i-create-a-new-project-in-linear/step-5-type.png",
+  "timestamp": "2025-11-14T19:50:59.091Z"
+}

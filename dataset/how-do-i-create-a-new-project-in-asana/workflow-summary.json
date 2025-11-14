@@ -1,0 +1,53 @@
+{
+  "task": "How do I create a new project in Asana",
+  "totalSteps": 5,
+  "startTime": "2025-11-14T20:43:31.572Z",
+  "endTime": "2025-11-14T20:44:13.498Z",
+  "steps": [
+    {
+      "stepNumber": 0,
+      "action": "navigate",
+      "reasoning": "Initial page load",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-asana/step-0-initial.png"
+    },
+    {
+      "stepNumber": 1,
+      "action": "click",
+      "selector": "div[aria-label=\"New project or portfolio\"]",
+      "coordinates": {
+        "x": 218,
+        "y": 279
+      },
+      "reasoning": "Clicking this button will initiate the process of creating a new project, leading to the desired end state where the project name field is visible.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-asana/step-1-click.png"
+    },
+    {
+      "stepNumber": 2,
+      "action": "click",
+      "selector": "div:has-text(\"New project\")",
+      "coordinates": {
+        "x": 288,
+        "y": 313
+      },
+      "reasoning": "Clicking 'New project' will open the dialog where the user can enter the project name, moving towards the goal of creating a new project.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-asana/step-2-click.png"
+    },
+    {
+      "stepNumber": 3,
+      "action": "click",
+      "selector": "div:has-text(\"Blank project\")",
+      "coordinates": {
+        "x": 1163.875,
+        "y": 31.5
+      },
+      "reasoning": "Clicking on 'Blank project' will initiate the creation of a new project, moving towards the goal of entering a project name.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-asana/step-3-click.png"
+    },
+    {
+      "stepNumber": 4,
+      "action": "complete",
+      "reasoning": "The task is fully completed as the project name field is visible, allowing the user to enter a name for the new project.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-asana/step-4-complete.png"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "stepNumber": 1,
+  "action": {
+    "type": "click",
+    "selector": "div:has-text(\"New Page\")",
+    "coordinates": {
+      "x": 401.125,
+      "y": 935
+    }
+  },
+  "reasoning": "Clicking this button will initiate the creation of a new page, which can be configured as a database in Notion.",
+  "description": "Click on the element with selector \"div:has-text(\"New Page\")\". Clicking this button will initiate the creation of a new page, which can be configured as a database in Notion. The element is located at coordinates (401.125, 935).",
+  "pageState": {
+    "url": "https://www.notion.so/New-Page-9d258782d2f74c03a29f60835b4bec86",
+    "title": "New Page"
+  },
+  "screenshotPath": "dataset/how-do-i-create-a-new-database-in-notion/step-1-click.png",
+  "timestamp": "2025-11-14T19:32:04.241Z"
+}
