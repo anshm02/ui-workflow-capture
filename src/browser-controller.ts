@@ -15,7 +15,7 @@ export class BrowserController {
     viewportHeight: number;
     userDataDir?: string;
   }): Promise<void> {
-    // Use persistent context if userDataDir is provided (maintains auth between runs)
+    // Use persistent context if userDataDir is provided
     if (config.userDataDir) {
       this.userDataDir = config.userDataDir;
       
@@ -78,20 +78,62 @@ export class BrowserController {
     };
   }
 
-  async click(selector: string): Promise<{ x: number; y: number }> {
+  async click(selector: string, targetBox?: { x: number; y: number; width: number; height: number }): Promise<{ x: number; y: number }> {
     if (!this.page) throw new Error('Browser not initialized');
 
-    const element = await this.page.locator(selector).first();
-    const boundingBox = await element.boundingBox();
+    const locator = this.page.locator(selector);
+    const count = await locator.count();
 
-    if (!boundingBox) {
+
+    let elementToClick = null;
+    let clickBoundingBox = null;
+
+    if (targetBox && count > 1) {
+      // Loop through all elements and find the one matching the target bounding box
+      let bestMatch = null;
+      let smallestDifference = Infinity;
+
+      for (let i = 0; i < count; i++) {
+        const element = locator.nth(i);
+        const box = await element.boundingBox();
+
+        if (box) {
+          
+          // Calculate difference between this box and target box
+          const diff = Math.abs(box.x - targetBox.x) + 
+                       Math.abs(box.y - targetBox.y) +
+                       Math.abs(box.width - targetBox.width) +
+                       Math.abs(box.height - targetBox.height);
+
+          if (diff < smallestDifference) {
+            smallestDifference = diff;
+            bestMatch = element;
+            clickBoundingBox = box;
+          }
+        }
+      }
+
+      if (bestMatch) {
+        elementToClick = bestMatch;
+      }
+    }
+
+    // Fallback: if no target box provided or no match found, use first element
+    if (!elementToClick) {
+      elementToClick = locator.first();
+      clickBoundingBox = await elementToClick.boundingBox();
+    }
+
+    if (!clickBoundingBox) {
       throw new Error(`Element not found or not visible: ${selector}`);
     }
 
-    const x = boundingBox.x + boundingBox.width / 2;
-    const y = boundingBox.y + boundingBox.height / 2;
+    const x = clickBoundingBox.x + clickBoundingBox.width / 2;
+    const y = clickBoundingBox.y + clickBoundingBox.height / 2;
 
-    await element.click();
+    console.log(`Clicking at: (${x}, ${y})`);
+
+    await elementToClick.click();
     await this.page.waitForTimeout(1000);
 
     return { x, y };
@@ -263,7 +305,7 @@ export class BrowserController {
           return `${tagName}[name="${name}"]`;
         } else {
           if (el.id) {
-            return `#${el.id}`;
+            return `${tagName}[id="${el.id}"]`;
           } else if (el.className && typeof el.className === 'string') {
             const classes = el.className.split(' ').filter((c: string) => c && !/^[0-9]/.test(c)).slice(0, 2).join('.');
             if (classes) {
@@ -283,10 +325,12 @@ export class BrowserController {
 
         const rect = el.getBoundingClientRect();
         const isVisible =
-          rect.width > 0 &&
-          rect.height > 0 &&
-          window.getComputedStyle(el).visibility !== 'hidden' &&
-          window.getComputedStyle(el).display !== 'none';
+        rect.width > 0 &&
+        rect.height > 0 &&
+        window.getComputedStyle(el).visibility !== 'hidden' &&
+        window.getComputedStyle(el).display !== 'none' &&
+        window.getComputedStyle(el).opacity !== '0' &&
+        window.getComputedStyle(el).pointerEvents !== 'none';
 
         if (!isVisible) return;
 

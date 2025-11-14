@@ -4,15 +4,26 @@ import { WorkflowStep, ActionExecuted } from './types';
 export class WorkflowState {
   private steps: WorkflowStep[] = [];
   private userTask: string;
-  private screenshotDir: string;
+  private taskPath: string;
+  private elementsPath: string;
 
-  constructor(userTask: string, screenshotDir: string) {
+  constructor(userTask: string, taskPath: string, elementsPath: string) {
     this.userTask = userTask;
-    this.screenshotDir = screenshotDir;
+    this.taskPath = taskPath;
+    this.elementsPath = elementsPath;
   }
 
   async initialize(): Promise<void> {
-    await fs.mkdir(this.screenshotDir, { recursive: true });
+    await fs.mkdir(this.taskPath, { recursive: true });
+    await fs.mkdir(this.elementsPath, { recursive: true });
+  }
+
+  getTaskPath(): string {
+    return this.taskPath;
+  }
+
+  getElementsPath(): string {
+    return this.elementsPath;
   }
 
   addStep(
@@ -55,7 +66,7 @@ export class WorkflowState {
       })),
     };
 
-    const summaryPath = `${this.screenshotDir}/workflow-summary.json`;
+    const summaryPath = `${this.taskPath}/workflow-summary.json`;
     await fs.writeFile(summaryPath, JSON.stringify(summary, null, 2));
 
     console.log(`\nWorkflow Summary:`);

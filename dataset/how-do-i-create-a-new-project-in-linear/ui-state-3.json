@@ -1,0 +1,16 @@
+{
+  "stepNumber": 3,
+  "action": {
+    "type": "type",
+    "selector": "div[aria-label=\"Project name\"]",
+    "text": "New Project Name"
+  },
+  "reasoning": "Entering the project name is a crucial step in creating a new project, which is necessary to complete the task.",
+  "description": "Type \"New Project Name\" into the input field with selector \"div[aria-label=\"Project name\"]\". Entering the project name is a crucial step in creating a new project, which is necessary to complete the task.",
+  "pageState": {
+    "url": "https://linear.app/test12321100/projects/all",
+    "title": "Projects"
+  },
+  "screenshotPath": "dataset/how-do-i-create-a-new-project-in-linear/step-3-type.png",
+  "timestamp": "2025-11-14T19:50:49.405Z"
+}

@@ -1,0 +1,19 @@
+{
+  "stepNumber": 2,
+  "action": {
+    "type": "click",
+    "selector": "button:has-text(\"Set priority\")",
+    "coordinates": {
+      "x": 1140,
+      "y": 112
+    }
+  },
+  "reasoning": "Clicking this button will allow the user to select a new priority level, which is necessary to change it to low.",
+  "description": "Click on the element with selector \"button:has-text(\"Set priority\")\" (text: \"Set priority\") which is a button. Clicking this button will allow the user to select a new priority level, which is necessary to change it to low. The element is located at coordinates (1140, 112).",
+  "pageState": {
+    "url": "https://linear.app/test12321100/issue/TES-2/set-up-your-teams-2",
+    "title": "TES-2 Set up your teams (2)"
+  },
+  "screenshotPath": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-2-click.png",
+  "timestamp": "2025-11-14T20:18:17.584Z"
+}

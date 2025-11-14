@@ -1,0 +1,19 @@
+{
+  "stepNumber": 1,
+  "action": {
+    "type": "click",
+    "selector": "a:has-text(\"TES-2Set up your teams (2)Nov 7\")",
+    "coordinates": {
+      "x": 758,
+      "y": 145
+    }
+  },
+  "reasoning": "Clicking on the project will open its details, where the priority can be edited to low.",
+  "description": "Click on the element with selector \"a:has-text(\"TES-2Set up your teams (2)Nov 7\")\". Clicking on the project will open its details, where the priority can be edited to low. The element is located at coordinates (758, 145).",
+  "pageState": {
+    "url": "https://linear.app/test12321100/issue/TES-2/set-up-your-teams-2",
+    "title": "TES-2 Set up your teams (2)"
+  },
+  "screenshotPath": "dataset/how-do-i-edit-the-priority-of-a-project-to-low-in-/step-1-click.png",
+  "timestamp": "2025-11-14T20:18:10.972Z"
+}

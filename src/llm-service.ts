@@ -9,72 +9,125 @@ export class LLMService {
     this.client = new OpenAI({ apiKey });
   }
 
+  private async retryWithBackoff<T>(
+    fn: () => Promise<T>,
+    maxRetries: number = 5
+  ): Promise<T> {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return await fn();
+      } catch (error: any) {
+        if (error?.status === 429 && i < maxRetries - 1) {
+          const delay = Math.min(1000 * Math.pow(2, i), 30000);
+          console.log(`Rate limited. Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error('Max retries exceeded');
+  }
+
+  async determineEndState(userTask: string): Promise<string> {
+    return this.retryWithBackoff(async () => {
+      const response = await this.client.chat.completions.create({
+        model: this.model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You determine the minimum end state for a UI automation task. The end state should be the earliest point where the core action is complete, not including any optional follow-up actions.',
+          },
+          {
+            role: 'user',
+            content: `Task: "${userTask}"\n\nDescribe the minimum UI state that indicates this task is complete. Be specific about what should be visible or what state the UI should be in.\n\nExamples:\n- "filter a database" → Stop when the filter dropdown/menu is visible\n- "create a new page" → Stop when the new blank page is created (do not fill in content)\n- "add a task" → Stop when the task input is confirmed\n\nReturn JSON: {"endState": "description of minimum end state"}`,
+          },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0,
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error('No response from LLM');
+      }
+
+      const result = JSON.parse(content) as { endState: string };
+      return result.endState;
+    });
+  }
+
   async determineNextAction(
     userTask: string,
     currentState: PageState,
-    history: WorkflowStep[]
+    history: WorkflowStep[],
+    endState: string
   ): Promise<LLMDecision> {
-    const historyContext = this.formatHistory(history);
-    
-    const systemPrompt = this.buildSystemPrompt();
-    const userPrompt = this.buildUserPrompt(userTask, currentState, historyContext);
+    return this.retryWithBackoff(async () => {
+      const historyContext = this.formatHistory(history);
+      
+      const systemPrompt = this.buildSystemPrompt(endState);
+      const userPrompt = this.buildUserPrompt(userTask, currentState, historyContext);
 
-    const response = await this.client.chat.completions.create({
-      model: this.model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: userPrompt },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:image/png;base64,${currentState.screenshotBase64}`,
+      const response = await this.client.chat.completions.create({
+        model: this.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: userPrompt },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:image/png;base64,${currentState.screenshotBase64}`,
+                },
               },
-            },
-          ],
-        },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.1,
+            ],
+          },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.1,
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error('No response from LLM');
+      }
+
+      return JSON.parse(content) as LLMDecision;
     });
-
-    const content = response.choices[0].message.content;
-    if (!content) {
-      throw new Error('No response from LLM');
-    }
-
-    return JSON.parse(content) as LLMDecision;
   }
 
   async determineInitialUrl(userTask: string): Promise<string> {
-    const response = await this.client.chat.completions.create({
-      model: this.model,
-      messages: [
-        {
-          role: 'system',
-          content: 'You determine which web application to navigate to based on the user\'s intended task. Return only a JSON object with "url" field.',
-        },
-        {
-          role: 'user',
-          content: `Task: "${userTask}"\n\nReturn the login or main URL for the application. Response format: {"url": "https://..."}`,
-        },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0,
+    return this.retryWithBackoff(async () => {
+      const response = await this.client.chat.completions.create({
+        model: this.model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You determine which web application to navigate to based on the user\'s intended task. Return only a JSON object with "url" field.',
+          },
+          {
+            role: 'user',
+            content: `Task: "${userTask}"\n\nReturn the login or main URL for the application. Response format: {"url": "https://..."}`,
+          },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0,
+      });
+
+      const content = response.choices[0].message.content;
+      if (!content) {
+        throw new Error('No response from LLM');
+      }
+
+      const result = JSON.parse(content) as { url: string };
+      return result.url;
     });
-
-    const content = response.choices[0].message.content;
-    if (!content) {
-      throw new Error('No response from LLM');
-    }
-
-    const result = JSON.parse(content) as { url: string };
-    return result.url;
   }
 
-  private buildSystemPrompt(): string {
+  private buildSystemPrompt(endState: string): string {
     return `You are an expert UI automation agent. Analyze the current page state and determine the next action to complete the user's task.
   
   You must respond with a JSON object containing:
@@ -86,6 +139,11 @@ export class LLMService {
     "reasoning": "brief explanation of why this action advances toward the goal",
     "completed": boolean indicating if the task is fully completed
   }
+  
+  TASK END STATE:
+  ${endState}
+  
+  IMPORTANT: Set completed=true as soon as the above end state is reached. Do NOT continue with additional actions beyond this point.
   
   CRITICAL SELECTOR RULES:
   - You MUST copy the EXACT "selector" value from the interactive elements list
@@ -108,7 +166,7 @@ export class LLMService {
   - For text areas, look for selectors with aria-label like div[aria-label="Start typing to edit text"]
   - When multiple similar elements exist, choose the one most relevant to your task
   - Take incremental steps toward the goal
-  - Set completed=true only when the task is fully accomplished`;
+  - Set completed=true only when the defined end state is reached`;
   }
 
   private buildUserPrompt(

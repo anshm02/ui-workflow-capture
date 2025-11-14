@@ -1,0 +1,53 @@
+{
+  "task": "How do I create a new database in Notion?",
+  "totalSteps": 5,
+  "startTime": "2025-11-14T19:31:54.086Z",
+  "endTime": "2025-11-14T19:32:19.065Z",
+  "steps": [
+    {
+      "stepNumber": 0,
+      "action": "navigate",
+      "reasoning": "Initial page load",
+      "screenshot": "dataset/how-do-i-create-a-new-database-in-notion/step-0-initial.png"
+    },
+    {
+      "stepNumber": 1,
+      "action": "click",
+      "selector": "div:has-text(\"New Page\")",
+      "coordinates": {
+        "x": 401.125,
+        "y": 935
+      },
+      "reasoning": "Clicking this button will initiate the creation of a new page, which can be configured as a database in Notion.",
+      "screenshot": "dataset/how-do-i-create-a-new-database-in-notion/step-1-click.png"
+    },
+    {
+      "stepNumber": 2,
+      "action": "click",
+      "selector": "div:has-text(\"Database\")",
+      "coordinates": {
+        "x": 726.2734375,
+        "y": 588
+      },
+      "reasoning": "Clicking the 'Database' button will initiate the process of creating a new database, which is the goal of the task.",
+      "screenshot": "dataset/how-do-i-create-a-new-database-in-notion/step-2-click.png"
+    },
+    {
+      "stepNumber": 3,
+      "action": "click",
+      "selector": "div:has-text(\"Empty database\")",
+      "coordinates": {
+        "x": 492,
+        "y": 164.5
+      },
+      "reasoning": "Clicking 'Empty database' will initiate the creation of a new database, progressing toward the completion of the task.",
+      "screenshot": "dataset/how-do-i-create-a-new-database-in-notion/step-3-click.png"
+    },
+    {
+      "stepNumber": 4,
+      "action": "complete",
+      "reasoning": "The task of creating a new database is fully completed as the new database is now visible in the workspace.",
+      "screenshot": "dataset/how-do-i-create-a-new-database-in-notion/step-4-complete.png"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "task": "How do I create a new page in Notion?",
+  "totalSteps": 3,
+  "startTime": "2025-11-14T19:15:51.444Z",
+  "endTime": "2025-11-14T19:16:03.082Z",
+  "steps": [
+    {
+      "stepNumber": 0,
+      "action": "navigate",
+      "reasoning": "Initial page load",
+      "screenshot": "dataset/how-do-i-create-a-new-page-in-notion/step-0-initial.png"
+    },
+    {
+      "stepNumber": 1,
+      "action": "click",
+      "selector": "a:has-text(\"New page\")",
+      "coordinates": {
+        "x": 120,
+        "y": 289
+      },
+      "reasoning": "Clicking on 'New page' will initiate the creation of a new page, moving us closer to the task of creating a new page in Notion.",
+      "screenshot": "dataset/how-do-i-create-a-new-page-in-notion/step-1-click.png"
+    },
+    {
+      "stepNumber": 2,
+      "action": "complete",
+      "reasoning": "The task of creating a new page in Notion is complete as the title input field is now accessible for editing.",
+      "screenshot": "dataset/how-do-i-create-a-new-page-in-notion/step-2-complete.png"
+    }
+  ]
+}

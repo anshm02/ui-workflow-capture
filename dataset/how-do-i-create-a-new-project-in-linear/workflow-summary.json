@@ -1,0 +1,74 @@
+{
+  "task": "How do I create a new project in Linear",
+  "totalSteps": 8,
+  "startTime": "2025-11-14T19:50:33.732Z",
+  "endTime": "2025-11-14T19:51:11.768Z",
+  "steps": [
+    {
+      "stepNumber": 0,
+      "action": "navigate",
+      "reasoning": "Initial page load",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-0-initial.png"
+    },
+    {
+      "stepNumber": 1,
+      "action": "click",
+      "selector": "a:has-text(\"Projects\")",
+      "coordinates": {
+        "x": 122,
+        "y": 167.046875
+      },
+      "reasoning": "Clicking on 'Projects' will navigate to the projects section where the user can create a new project.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-1-click.png"
+    },
+    {
+      "stepNumber": 2,
+      "action": "click",
+      "selector": "[aria-label=\"Add project\"]",
+      "coordinates": {
+        "x": 1145.6953125,
+        "y": 28.5
+      },
+      "reasoning": "Clicking this button will initiate the process of creating a new project, which is the next step toward completing the task.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-2-click.png"
+    },
+    {
+      "stepNumber": 3,
+      "action": "type",
+      "selector": "div[aria-label=\"Project name\"]",
+      "reasoning": "Entering the project name is a crucial step in creating a new project, which is necessary to complete the task.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-3-type.png"
+    },
+    {
+      "stepNumber": 4,
+      "action": "type",
+      "selector": "div[aria-label=\"Project summary\"]",
+      "reasoning": "Entering a summary is a necessary step in the project creation process, which will help provide context for the project.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-4-type.png"
+    },
+    {
+      "stepNumber": 5,
+      "action": "type",
+      "selector": "div[aria-label=\"Project description\"]",
+      "reasoning": "Entering a description is essential for providing context and details about the project, which is necessary to complete the project creation process.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-5-type.png"
+    },
+    {
+      "stepNumber": 6,
+      "action": "click",
+      "selector": "button:has-text(\"Create project\")",
+      "coordinates": {
+        "x": 1031.22265625,
+        "y": 651.59375
+      },
+      "reasoning": "Clicking this button will complete the project creation process, which is the final step needed to achieve the task.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-6-click.png"
+    },
+    {
+      "stepNumber": 7,
+      "action": "complete",
+      "reasoning": "Clicking this link indicates that the project creation process is complete and allows the user to access the newly created project.",
+      "screenshot": "dataset/how-do-i-create-a-new-project-in-linear/step-7-complete.png"
+    }
+  ]
+}
